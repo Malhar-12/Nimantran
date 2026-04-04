@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Nimantran",
+    "slug": "invitewala-test2",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0C0C14"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0C0C14"
+      },
+      "package": "com.nimantran.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8d9d03c2-ba58-4dde-b585-b1762e348a5a"
+      }
+    },
+    "owner": "malhar-12"
+  }
+}
