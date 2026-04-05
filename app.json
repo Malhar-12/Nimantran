@@ -20,8 +20,18 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0C0C14"
       },
-      "package": "com.nimantran.app"
+      "package": "com.nimantran.app",
+      "permissions": ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE", "READ_MEDIA_IMAGES"]
     },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Nimantran to save invitation cards to your gallery.",
+          "savePhotosPermission": "Allow Nimantran to save invitation cards to your gallery."
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     },

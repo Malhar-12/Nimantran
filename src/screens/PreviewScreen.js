@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, StatusBar, TextInput, Share, Linking, Alert,
-  Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { findOccasion } from "../constants/occasions";
@@ -28,35 +27,147 @@ export default function PreviewScreen({ navigation }) {
   const lang = findLanguage(langCode);
   const [g1, g2] = occ.gradient;
 
-  const [sharing,  setSharing]  = useState(false);
-  const [waSent,   setWaSent]   = useState(false);
-  const [dbSaved,  setDbSaved]  = useState(false);
-  const [screenshotMode, setScreenshotMode] = useState(false);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [sharing,    setSharing]    = useState(false);
+  const [waSent,     setWaSent]     = useState(false);
+  const [dbSaved,    setDbSaved]    = useState(false);
+  const [saving,     setSaving]     = useState(false);
+  const [saved,      setSaved]      = useState(false);
+  const cardRef = useRef(null);
 
-  // Pulse animation for screenshot mode
-  function startPulse() {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.02, duration: 800, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-      ])
-    ).start();
+  // ─── Capture card as image and save to gallery ───
+  async function handleDownloadToGallery() {
+    try {
+      setSaving(true);
+
+      // Dynamic imports — safe if packages not available
+      let MediaLibrary, captureRef;
+      try {
+        MediaLibrary = require("expo-media-library");
+        captureRef = require("react-native-view-shot").captureRef;
+      } catch {
+        setSaving(false);
+        Alert.alert("📸 Save Your Card", "Take a screenshot to save the card!\n\nPress Power + Volume Down buttons together.", [{ text: "Got it!" }]);
+        return;
+      }
+
+      // Request permission
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Needed",
+          "Please allow Nimantran to save images to your gallery.",
+          [{ text: "OK" }]
+        );
+        setSaving(false);
+        return;
+      }
+
+      // Capture the card view as PNG
+      const uri = await captureRef(cardRef, {
+        format: "png",
+        quality: 1,
+        result: "tmpfile",
+      });
+
+      // Save to gallery
+      const asset = await MediaLibrary.createAssetAsync(uri);
+
+      // Try to create/find Nimantran album
+      try {
+        const album = await MediaLibrary.getAlbumAsync("Nimantran");
+        if (album) {
+          await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+        } else {
+          await MediaLibrary.createAlbumAsync("Nimantran", asset, false);
+        }
+      } catch {
+        // Album creation may fail on some devices, image is still saved to gallery
+      }
+
+      setSaved(true);
+      setSaving(false);
+      Alert.alert(
+        "✅ Saved!",
+        "Card saved to your gallery in 'Nimantran' folder. You can now share it from your gallery!",
+        [{ text: "Great!" }]
+      );
+      setTimeout(() => setSaved(false), 4000);
+    } catch (e) {
+      console.log("Save error:", e);
+      setSaving(false);
+      // Fallback: suggest screenshot
+      Alert.alert(
+        "📸 Save Your Card",
+        "Take a screenshot to save the card!\n\nPress Power + Volume Down buttons together.",
+        [{ text: "Got it!" }]
+      );
+    }
   }
 
-  // Share using built-in Share API (formatted text)
-  async function handleShare() {
+  // ─── Capture card and share as image ───
+  async function handleShareImage() {
     try {
       setSharing(true);
+
+      // Dynamic imports — safe if packages not available
+      let Sharing, captureRef;
+      try {
+        Sharing = require("expo-sharing");
+        captureRef = require("react-native-view-shot").captureRef;
+      } catch {
+        setSharing(false);
+        // Fallback to text share
+        const msg = buildWhatsAppMessage(occ, form, genText);
+        await Share.share({ title: `${occ.name} Invitation`, message: msg });
+        return;
+      }
+
+      // Capture the card as image
+      const uri = await captureRef(cardRef, {
+        format: "png",
+        quality: 1,
+        result: "tmpfile",
+      });
+
+      // Check if sharing is available on this device
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(uri, {
+          mimeType: "image/png",
+          dialogTitle: `${occ.name} Invitation - Nimantran`,
+        });
+      } else {
+        // Sharing not available — fallback to text
+        Alert.alert(
+          "Sharing not available",
+          "Image sharing is not supported on this device. You can download the card and share from gallery instead.",
+          [{ text: "OK" }]
+        );
+      }
+    } catch (e) {
+      console.log("Share image error:", e);
+      // Fallback to text share if image sharing fails
+      try {
+        const msg = buildWhatsAppMessage(occ, form, genText);
+        await Share.share({ title: `${occ.name} Invitation`, message: msg });
+      } catch {
+        // User cancelled
+      }
+    } finally {
+      setSharing(false);
+    }
+  }
+
+  // Share formatted text
+  async function handleShareText() {
+    try {
       const msg = buildWhatsAppMessage(occ, form, genText);
       await Share.share({
         title: `${occ.name} Invitation`,
         message: msg,
       });
-    } catch (e) {
-      // User cancelled or share failed
-    } finally {
-      setSharing(false);
+    } catch {
+      // User cancelled
     }
   }
 
@@ -80,18 +191,6 @@ export default function PreviewScreen({ navigation }) {
     }
   }
 
-  // Screenshot mode — hides all buttons, shows only card
-  function handleScreenshotMode() {
-    setScreenshotMode(true);
-    startPulse();
-  }
-
-  function exitScreenshotMode() {
-    pulseAnim.stopAnimation();
-    pulseAnim.setValue(1);
-    setScreenshotMode(false);
-  }
-
   async function handleSaveToHistory() {
     try {
       await apiSaveInvite({
@@ -109,33 +208,6 @@ export default function PreviewScreen({ navigation }) {
     }
   }
 
-  // ─── SCREENSHOT MODE — Clean card view for taking screenshot ───
-  if (screenshotMode) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
-        <ScrollView contentContainerStyle={styles.screenshotScroll} showsVerticalScrollIndicator={false}>
-          {/* Hint at top */}
-          <Animated.View style={[styles.screenshotHint, { transform: [{ scale: pulseAnim }] }]}>
-            <Text style={styles.screenshotHintText}>📸 Take screenshot now!</Text>
-            <Text style={styles.screenshotHintSub}>Press Power + Volume Down together</Text>
-          </Animated.View>
-
-          {/* Card — full width, clean, no borders */}
-          <View style={styles.screenshotCard}>
-            <InviteCard occ={occ} form={form} generatedText={genText} templateId={tmplId} langCode={langCode} />
-          </View>
-
-          {/* Exit button */}
-          <TouchableOpacity style={[styles.exitBtn, { borderColor: g1 + "44" }]} onPress={exitScreenshotMode} activeOpacity={0.8}>
-            <Text style={[styles.exitBtnTxt, { color: g1 }]}>✓ Done — Back to Preview</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  // ─── NORMAL PREVIEW MODE ───
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
@@ -149,37 +221,69 @@ export default function PreviewScreen({ navigation }) {
           <Text style={styles.topInfo}>{occ.name} · {tmpl.name} · {lang.english}</Text>
         </View>
 
-        {/* Card preview */}
-        <View style={[styles.cardWrap, { borderColor: g1 + "44", shadowColor: g1 }]}>
-          <InviteCard occ={occ} form={form} generatedText={genText} templateId={tmplId} langCode={langCode} />
+        {/* Card preview — wrapped in ref for capture */}
+        <View style={[styles.cardOuter, { borderColor: g1 + "44", shadowColor: g1 }]}>
+          <View
+            ref={cardRef}
+            collapsable={false}
+            style={styles.cardCapture}
+          >
+            <InviteCard occ={occ} form={form} generatedText={genText} templateId={tmplId} langCode={langCode} />
+          </View>
         </View>
 
         {/* Action buttons */}
         <View style={styles.actions}>
 
-          {/* Share as Image — MOST PROMINENT */}
+          {/* Download to Gallery — MOST PROMINENT */}
           <TouchableOpacity
-            style={[styles.imageShareBtn, { borderColor: g1 }]}
-            onPress={handleScreenshotMode}
+            style={[styles.actionCard, { borderColor: "#4ADE80" }]}
+            onPress={handleDownloadToGallery}
             activeOpacity={0.85}
+            disabled={saving}
           >
             <LinearGradient
-              colors={[g1 + "22", g1 + "08"]}
-              style={styles.imageShareInner}
+              colors={["rgba(74,222,128,0.15)", "rgba(74,222,128,0.05)"]}
+              style={styles.actionInner}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
-              <Text style={styles.imageShareEmoji}>📸</Text>
-              <View style={styles.imageShareTextWrap}>
-                <Text style={[styles.imageShareTitle, { color: g1 }]}>Share Card as Image</Text>
-                <Text style={styles.imageShareSub}>Opens fullscreen → take screenshot → share anywhere!</Text>
+              <Text style={styles.actionEmoji}>{saving ? "⏳" : saved ? "✅" : "💾"}</Text>
+              <View style={styles.actionTextWrap}>
+                <Text style={[styles.actionTitle, { color: "#4ADE80" }]}>
+                  {saving ? "Saving..." : saved ? "Saved to Gallery!" : "Download Card to Gallery"}
+                </Text>
+                <Text style={styles.actionSub}>Saves as image in Nimantran folder</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Share text to any app */}
-          <BigButton gradient={[g1, g2]} onPress={handleShare} loading={sharing} style={styles.shadow}>
-            📤  Share Text → Any App
+          {/* Share Card as Image */}
+          <TouchableOpacity
+            style={[styles.actionCard, { borderColor: g1 }]}
+            onPress={handleShareImage}
+            activeOpacity={0.85}
+            disabled={sharing}
+          >
+            <LinearGradient
+              colors={[g1 + "22", g1 + "08"]}
+              style={styles.actionInner}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.actionEmoji}>{sharing ? "⏳" : "📤"}</Text>
+              <View style={styles.actionTextWrap}>
+                <Text style={[styles.actionTitle, { color: g1 }]}>
+                  {sharing ? "Preparing..." : "Share Card as Image"}
+                </Text>
+                <Text style={styles.actionSub}>WhatsApp, Instagram, Telegram & more</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Share text */}
+          <BigButton gradient={[g1, g2]} onPress={handleShareText} style={styles.shadow}>
+            📝  Share Text → Any App
           </BigButton>
 
           {/* WhatsApp direct share */}
@@ -231,17 +335,21 @@ const styles = StyleSheet.create({
   backBtn: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.12)" },
   backTxt: { fontFamily: "Poppins_400Regular", color: "rgba(255,255,255,0.45)", fontSize: 11 },
   topInfo: { fontFamily: "Poppins_400Regular", color: "rgba(255,255,255,0.22)", fontSize: 10 },
-  cardWrap: { borderRadius: 16, overflow: "hidden", borderWidth: 2, marginBottom: 18, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16, elevation: 12 },
+
+  // Card — outer border for display, inner clean for capture
+  cardOuter: { borderRadius: 16, overflow: "hidden", borderWidth: 2, marginBottom: 18, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16, elevation: 12 },
+  cardCapture: { borderRadius: 14, overflow: "hidden" },
+
   actions: { gap: 10 },
   shadow:  { shadowOpacity: 0.4, shadowRadius: 16, elevation: 8 },
 
-  // Image share button — prominent
-  imageShareBtn: { borderWidth: 2, borderRadius: 16, overflow: "hidden" },
-  imageShareInner: { flexDirection: "row", alignItems: "center", padding: 16, gap: 12 },
-  imageShareEmoji: { fontSize: 32 },
-  imageShareTextWrap: { flex: 1 },
-  imageShareTitle: { fontFamily: "Poppins_700Bold", fontSize: 15 },
-  imageShareSub: { fontFamily: "Poppins_400Regular", fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 },
+  // Action buttons (download / share image)
+  actionCard: { borderWidth: 2, borderRadius: 16, overflow: "hidden" },
+  actionInner: { flexDirection: "row", alignItems: "center", padding: 16, gap: 12 },
+  actionEmoji: { fontSize: 30 },
+  actionTextWrap: { flex: 1 },
+  actionTitle: { fontFamily: "Poppins_700Bold", fontSize: 15 },
+  actionSub: { fontFamily: "Poppins_400Regular", fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 },
 
   // WhatsApp section
   waBox: { backgroundColor: "rgba(37,211,102,0.06)", borderWidth: 1.5, borderColor: "rgba(37,211,102,0.18)", borderRadius: 14, padding: 13 },
@@ -256,13 +364,4 @@ const styles = StyleSheet.create({
   ghostBtn:   { borderWidth: 1.5, borderRadius: 12, borderColor: "rgba(255,255,255,0.08)", paddingVertical: 11, alignItems: "center", backgroundColor: "rgba(255,255,255,0.04)" },
   ghostTxt:   { fontFamily: "Poppins_600SemiBold", fontSize: 12, color: "rgba(255,255,255,0.3)" },
   footer:     { textAlign: "center", marginTop: 16, color: "rgba(255,255,255,0.08)", fontSize: 9, fontFamily: "Poppins_400Regular" },
-
-  // Screenshot mode
-  screenshotScroll: { padding: 0, paddingBottom: 20 },
-  screenshotHint: { backgroundColor: "rgba(74,222,128,0.1)", borderBottomWidth: 1, borderColor: "rgba(74,222,128,0.2)", paddingVertical: 12, alignItems: "center" },
-  screenshotHintText: { fontFamily: "Poppins_700Bold", fontSize: 16, color: "#4ADE80" },
-  screenshotHintSub: { fontFamily: "Poppins_400Regular", fontSize: 11, color: "rgba(74,222,128,0.6)", marginTop: 2 },
-  screenshotCard: { marginHorizontal: 0, marginVertical: 0 },
-  exitBtn: { marginHorizontal: 20, marginTop: 16, borderWidth: 1.5, borderRadius: 12, paddingVertical: 12, alignItems: "center", backgroundColor: "rgba(255,255,255,0.04)" },
-  exitBtnTxt: { fontFamily: "Poppins_700Bold", fontSize: 14 },
 });
