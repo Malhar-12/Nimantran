@@ -1,17 +1,45 @@
 import React, { useEffect, useRef } from "react";
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, StatusBar, SafeAreaView,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, StatusBar, SafeAreaView, Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { CATEGORIES } from "../constants/occasions";
 import { useInviteStore } from "../store/inviteStore";
+import { firebaseSignOut } from "../lib/firebase";
 
 const HEADER_EMOJIS = ["\u{1FA94}","\u{1F382}","\u{1F389}","\u{1F4CB}","\u{1F30D}","\u2B50"];
 
 export default function HomeScreen({ navigation }) {
   const setCategoryId = useInviteStore(s => s.setCategoryId);
   const resetFlow     = useInviteStore(s => s.resetFlow);
+  const user          = useInviteStore(s => s.user);
+  const logout        = useInviteStore(s => s.logout);
   const bounceAnims   = useRef(HEADER_EMOJIS.map(() => new Animated.Value(0))).current;
+
+  function handleAccount() {
+    if (!user) {
+      navigation.navigate("Phone");
+      return;
+    }
+    Alert.alert(
+      user.name || "Account",
+      `${user.phone}${user.tier === "free" ? "" : `\nTier: ${user.tier.toUpperCase()}`}`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign out",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+            await firebaseSignOut();
+          },
+        },
+      ]
+    );
+  }
+
+  // First letter for the avatar circle
+  const initial = (user?.name || "G").trim().charAt(0).toUpperCase();
 
   useEffect(() => {
     const anims = bounceAnims.map((val, i) =>
@@ -35,6 +63,23 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
+      {/* Top-right account button */}
+      <TouchableOpacity
+        onPress={handleAccount}
+        activeOpacity={0.85}
+        style={styles.accountBtn}
+      >
+        <LinearGradient
+          colors={user ? ["#C77DFF", "#7B2FBE"] : ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.04)"]}
+          style={styles.accountInner}
+        >
+          <Text style={[styles.accountInitial, !user && { color: "rgba(255,255,255,0.5)" }]}>
+            {user ? initial : "↪"}
+          </Text>
+        </LinearGradient>
+        {!user && <Text style={styles.accountLabel}>Sign in</Text>}
+      </TouchableOpacity>
+
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.emojiRow}>
@@ -91,4 +136,32 @@ const styles = StyleSheet.create({
   catCount: { fontFamily: "Poppins_400Regular", color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 2 },
   arrow:    { color: "rgba(255,255,255,0.2)", fontSize: 22 },
   footer:   { textAlign: "center", marginTop: 18, color: "rgba(255,255,255,0.12)", fontSize: 10, fontFamily: "Poppins_400Regular" },
+  accountBtn: {
+    position: "absolute",
+    top: 50,
+    right: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  accountInner: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(199,125,255,0.3)",
+  },
+  accountInitial: {
+    fontFamily: "Poppins_700Bold",
+    fontSize: 16,
+    color: "#fff",
+  },
+  accountLabel: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 11,
+    color: "rgba(255,255,255,0.55)",
+    marginLeft: 8,
+  },
 });
