@@ -14,8 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nimantran.app",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "bundleIdentifier": "com.nimantran.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +22,6 @@
         "backgroundColor": "#0C0C14"
       },
       "package": "com.nimantran.app",
-      "googleServicesFile": "./google-services.json",
       "permissions": [
         "WRITE_EXTERNAL_STORAGE",
         "READ_EXTERNAL_STORAGE",
@@ -33,19 +31,6 @@
       ]
     },
     "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "extraMavenRepos": []
-          },
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ],
       "expo-secure-store",
       [
         "expo-media-library",
@@ -61,6 +46,16 @@
     "extra": {
       "eas": {
         "projectId": "8d9d03c2-ba58-4dde-b585-b1762e348a5a"
+      },
+      "_firebaseDisabled": {
+        "reason": "Guest-only mode until Firebase Blaze plan is enabled. To re-enable: restore the plugin entries below and add googleServicesFile keys back under ios/android.",
+        "iosGoogleServicesFile": "./GoogleService-Info.plist",
+        "androidGoogleServicesFile": "./google-services.json",
+        "plugins": [
+          "@react-native-firebase/app",
+          "@react-native-firebase/auth",
+          ["expo-build-properties", { "android": { "extraMavenRepos": [] }, "ios": { "useFrameworks": "static" } }]
+        ]
       }
     },
     "owner": "malhar-12"

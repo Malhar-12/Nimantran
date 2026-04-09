@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getStoredToken, clearStoredToken, apiGetMe } from "../api/client";
+import { getStoredToken, clearStoredToken, apiGetMe, apiGuestInit } from "../api/client";
 
 export const useInviteStore = create((set, get) => ({
   // ── Auth ─────────────────────────────────────────────
@@ -37,6 +37,29 @@ export const useInviteStore = create((set, get) => ({
         await clearStoredToken();
         set({ user: null, token: null, authChecked: true });
       }
+    } catch {
+      set({ authChecked: true });
+    }
+  },
+
+  /**
+   * Guest-only mode boot. Gets (or mints) a device-scoped guest JWT so
+   * Save/Share/Generate work without phone login. No PII collected.
+   */
+  ensureGuest: async () => {
+    try {
+      let token = await getStoredToken();
+      if (!token) {
+        try {
+          const data = await apiGuestInit();
+          token = data.token;
+        } catch (e) {
+          // Network down on first boot — let app run anyway, try again later
+          set({ authChecked: true });
+          return;
+        }
+      }
+      set({ token, user: null, authChecked: true });
     } catch {
       set({ authChecked: true });
     }

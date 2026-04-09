@@ -15,9 +15,11 @@ import LanguagesScreen from "../screens/LanguagesScreen";
 import PreviewScreen   from "../screens/PreviewScreen";
 import HistoryScreen   from "../screens/HistoryScreen";
 
-import PhoneScreen from "../screens/auth/PhoneScreen";
-import OtpScreen   from "../screens/auth/OtpScreen";
-import NameScreen  from "../screens/auth/NameScreen";
+// ── Firebase phone auth screens (DISABLED in guest-only mode) ──
+// Re-enable when Firebase Blaze plan is active.
+// import PhoneScreen from "../screens/auth/PhoneScreen";
+// import OtpScreen   from "../screens/auth/OtpScreen";
+// import NameScreen  from "../screens/auth/NameScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -58,13 +60,13 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const hydrateAuth = useInviteStore((s) => s.hydrateAuth);
+  // ── Guest-only mode: skip Firebase hydration ──
+  // const hydrateAuth = useInviteStore((s) => s.hydrateAuth);
+  // const authChecked = useInviteStore((s) => s.authChecked);
+  // useEffect(() => { hydrateAuth(); }, [hydrateAuth]);
+  const ensureGuest = useInviteStore((s) => s.ensureGuest);
   const authChecked = useInviteStore((s) => s.authChecked);
-
-  // Boot: try to load existing session token from SecureStore
-  useEffect(() => {
-    hydrateAuth();
-  }, [hydrateAuth]);
+  useEffect(() => { ensureGuest(); }, [ensureGuest]);
 
   if (!authChecked) {
     return (
@@ -89,10 +91,10 @@ export default function AppNavigator() {
         <Stack.Screen name="Languages" component={LanguagesScreen} />
         <Stack.Screen name="Preview"   component={PreviewScreen} />
 
-        {/* Auth flow — pushed when login is required */}
-        <Stack.Screen name="Phone" component={PhoneScreen} options={{ animation: "slide_from_bottom" }} />
-        <Stack.Screen name="Otp"   component={OtpScreen} />
-        <Stack.Screen name="Name"  component={NameScreen} />
+        {/* Auth flow — DISABLED in guest-only mode. Re-enable with Firebase. */}
+        {/* <Stack.Screen name="Phone" component={PhoneScreen} options={{ animation: "slide_from_bottom" }} /> */}
+        {/* <Stack.Screen name="Otp"   component={OtpScreen} /> */}
+        {/* <Stack.Screen name="Name"  component={NameScreen} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

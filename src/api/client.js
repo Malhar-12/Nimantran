@@ -49,6 +49,17 @@ async function request(path, options = {}) {
   return data;
 }
 
+// ═══ GUEST MODE ══════════════════════════════════════════
+/**
+ * Mint a device-scoped guest JWT. No phone, no PII.
+ * Used while Firebase Phone Auth is disabled (pre-Blaze).
+ */
+export async function apiGuestInit() {
+  const data = await request("/auth/guest", { method: "POST" });
+  if (data.token) await setStoredToken(data.token);
+  return data;
+}
+
 // ═══ AUTH ════════════════════════════════════════════════
 /**
  * Exchange a Firebase ID token for our backend session JWT.

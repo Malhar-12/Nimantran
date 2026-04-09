@@ -5,7 +5,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { CATEGORIES } from "../constants/occasions";
 import { useInviteStore } from "../store/inviteStore";
-import { firebaseSignOut } from "../lib/firebase";
+// ── Firebase disabled in guest-only mode ──
+// import { firebaseSignOut } from "../lib/firebase";
 
 const HEADER_EMOJIS = ["\u{1FA94}","\u{1F382}","\u{1F389}","\u{1F4CB}","\u{1F30D}","\u2B50"];
 
@@ -16,27 +17,19 @@ export default function HomeScreen({ navigation }) {
   const logout        = useInviteStore(s => s.logout);
   const bounceAnims   = useRef(HEADER_EMOJIS.map(() => new Animated.Value(0))).current;
 
-  function handleAccount() {
-    if (!user) {
-      navigation.navigate("Phone");
-      return;
-    }
-    Alert.alert(
-      user.name || "Account",
-      `${user.phone}${user.tier === "free" ? "" : `\nTier: ${user.tier.toUpperCase()}`}`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign out",
-          style: "destructive",
-          onPress: async () => {
-            await logout();
-            await firebaseSignOut();
-          },
-        },
-      ]
-    );
-  }
+  // ── Account handler DISABLED in guest-only mode ──
+  // function handleAccount() {
+  //   if (!user) { navigation.navigate("Phone"); return; }
+  //   Alert.alert(
+  //     user.name || "Account",
+  //     `${user.phone}${user.tier === "free" ? "" : `\nTier: ${user.tier.toUpperCase()}`}`,
+  //     [
+  //       { text: "Cancel", style: "cancel" },
+  //       { text: "Sign out", style: "destructive",
+  //         onPress: async () => { await logout(); await firebaseSignOut(); } },
+  //     ]
+  //   );
+  // }
 
   // First letter for the avatar circle
   const initial = (user?.name || "G").trim().charAt(0).toUpperCase();
@@ -63,12 +56,9 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
-      {/* Top-right account button */}
-      <TouchableOpacity
-        onPress={handleAccount}
-        activeOpacity={0.85}
-        style={styles.accountBtn}
-      >
+      {/* Top-right account button — HIDDEN in guest-only mode (re-enable with Firebase) */}
+      {/*
+      <TouchableOpacity onPress={handleAccount} activeOpacity={0.85} style={styles.accountBtn}>
         <LinearGradient
           colors={user ? ["#C77DFF", "#7B2FBE"] : ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.04)"]}
           style={styles.accountInner}
@@ -79,6 +69,7 @@ export default function HomeScreen({ navigation }) {
         </LinearGradient>
         {!user && <Text style={styles.accountLabel}>Sign in</Text>}
       </TouchableOpacity>
+      */}
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
