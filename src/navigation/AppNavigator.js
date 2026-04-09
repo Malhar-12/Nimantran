@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View } from "react-native";
+import NimantranLoader from "../components/NimantranLoader";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "react-native";
 
 import { useInviteStore } from "../store/inviteStore";
+import { useT } from "../i18n";
 
 import HomeScreen      from "../screens/HomeScreen";
 import OccasionsScreen from "../screens/OccasionsScreen";
@@ -31,6 +33,7 @@ const screenOptions = {
 };
 
 function MainTabs() {
+  const t = useT();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -49,11 +52,11 @@ function MainTabs() {
     >
       <Tab.Screen
         name="Home" component={HomeScreen}
-        options={{ tabBarLabel: "Create", tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>{"\u2728"}</Text> }}
+        options={{ tabBarLabel: t("create"), tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>{"\u2728"}</Text> }}
       />
       <Tab.Screen
         name="History" component={HistoryScreen}
-        options={{ tabBarLabel: "My Invites", tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>{"\u{1F5C2}\uFE0F"}</Text> }}
+        options={{ tabBarLabel: t("myInvites"), tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>{"\u{1F5C2}\uFE0F"}</Text> }}
       />
     </Tab.Navigator>
   );
@@ -71,7 +74,7 @@ export default function AppNavigator() {
   if (!authChecked) {
     return (
       <View style={{ flex: 1, backgroundColor: "#0C0C14", justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator color="#C77DFF" size="large" />
+        <NimantranLoader label="Nimantran" sublabel="निमंत्रण ✨" />
       </View>
     );
   }

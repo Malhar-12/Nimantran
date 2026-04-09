@@ -8,10 +8,13 @@ import { findOccasion } from "../constants/occasions";
 import { fallbackText } from "../utils/formatters";
 import { apiGenerate } from "../api/client";
 import { useInviteStore } from "../store/inviteStore";
+import { useT } from "../i18n";
 import ProgressDots from "../components/ProgressDots";
 import BigButton from "../components/BigButton";
+import NimantranLoader from "../components/NimantranLoader";
 
 export default function LanguagesScreen({ navigation }) {
+  const T = useT();
   const occId          = useInviteStore(s => s.occasionId);
   const langCode       = useInviteStore(s => s.langCode);
   const form           = useInviteStore(s => s.form);
@@ -73,35 +76,35 @@ export default function LanguagesScreen({ navigation }) {
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backTxt}>{"\u2190"} Back</Text>
+          <Text style={styles.backTxt}>{"\u2190"} {T("back")}</Text>
         </TouchableOpacity>
         <View style={styles.headCenter}>
           <Text style={styles.emoji}>{"\u{1F310}"}</Text>
-          <Text style={styles.title}>Choose Language</Text>
-          <Text style={styles.sub}>AI writes in your language</Text>
+          <Text style={styles.title}>{T("chooseLangTitle")}</Text>
+          <Text style={styles.sub}>{T("chooseLangSub")}</Text>
           <ProgressDots step={3} total={5} color={g1} />
         </View>
         <View style={styles.card}>
-          <Text style={[styles.section, { color: g1 }]}>{"\u{1F1EE}\u{1F1F3}"} INDIAN LANGUAGES</Text>
+          <Text style={[styles.section, { color: g1 }]}>{T("indianLangs")}</Text>
           <View style={styles.langGrid}>
             {INDIAN_LANGUAGES.map(l => <LangBtn key={l.code} item={l} />)}
           </View>
-          <Text style={[styles.section, { color: g1, marginTop: 16 }]}>{"\u{1F30D}"} INTERNATIONAL</Text>
+          <Text style={[styles.section, { color: g1, marginTop: 16 }]}>{T("international")}</Text>
           <View style={styles.langGrid}>
             {GLOBAL_LANGUAGES.map(l => <LangBtn key={l.code} item={l} />)}
           </View>
           {loading ? (
             <View style={styles.progressWrap}>
-              <Text style={styles.progressIcon}>{occ.icons[0]}</Text>
-              <Text style={styles.progressLabel}>{"\u2728"} Writing in {lang.english}...</Text>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: g1 }]} />
-              </View>
+              <NimantranLoader
+                color={g1}
+                label={`${T("writingIn")} ${lang.english}…`}
+                sublabel={T("almostThere")}
+              />
             </View>
           ) : (
             <View style={{ marginTop: 18 }}>
               <BigButton gradient={[g1, g2]} onPress={handleGenerate}>
-                {occ.icons[0]} Generate Card in {lang.english} {"\u2728"}
+                {occ.icons[0]} {T("generateIn")} {lang.english} {"\u2728"}
               </BigButton>
             </View>
           )}
