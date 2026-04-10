@@ -54,8 +54,8 @@ export default function FloralCard({ occ, form, generatedText, t }) {
           <Text style={styles.detailValue}>{form.location || "—"}</Text>
         </View>
 
-        {form.note ? (
-          <Text style={[styles.noteText, { color: g1 + "99" }]}>"{form.note}"</Text>
+        {form.note?.trim() ? (
+          <Text style={[styles.noteText, { color: g1 + "99" }]}>"{form.note.trim()}"</Text>
         ) : null}
       </View>
 

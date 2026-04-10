@@ -47,8 +47,8 @@ export default function ModernCard({ occ, form, generatedText, t }) {
           ))}
         </View>
 
-        {form.note ? (
-          <Text style={[styles.noteText, { color: g1 }]}>"{form.note}"</Text>
+        {form.note?.trim() ? (
+          <Text style={[styles.noteText, { color: g1 }]}>"{form.note.trim()}"</Text>
         ) : null}
 
         <Text style={styles.emojiStrip}>{occ.icons.join(" ")}</Text>

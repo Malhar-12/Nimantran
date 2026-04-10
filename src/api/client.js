@@ -30,8 +30,18 @@ async function request(path, options = {}) {
   };
   let res;
   try {
-    res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+    // 60s timeout — Render free tier cold-starts can take ~50s
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 60000);
+    try {
+      res = await fetch(`${BASE_URL}${path}`, { ...options, headers, signal: ctrl.signal });
+    } finally {
+      clearTimeout(timer);
+    }
   } catch (e) {
+    if (e.name === "AbortError") {
+      throw new Error("Server is waking up. Please try again in a moment.");
+    }
     throw new Error("Network error — check your internet connection");
   }
   let data;

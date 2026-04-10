@@ -10,10 +10,12 @@ import { findLanguage } from "../constants/languages";
 import { buildWhatsAppMessage } from "../utils/formatters";
 import { apiSaveInvite } from "../api/client";
 import { useInviteStore } from "../store/inviteStore";
+import { useT } from "../i18n";
 import InviteCard from "../components/InviteCard";
 import BigButton from "../components/BigButton";
 
 export default function PreviewScreen({ navigation }) {
+  const t = useT();
   const occId        = useInviteStore(s => s.occasionId);
   const tmplId       = useInviteStore(s => s.templateId);
   const langCode     = useInviteStore(s => s.langCode);
@@ -216,7 +218,7 @@ export default function PreviewScreen({ navigation }) {
         {/* Top bar */}
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Text style={styles.backTxt}>← Back</Text>
+            <Text style={styles.backTxt}>← {t("back")}</Text>
           </TouchableOpacity>
           <Text style={styles.topInfo}>{occ.name} · {tmpl.name} · {lang.english}</Text>
         </View>
@@ -251,9 +253,9 @@ export default function PreviewScreen({ navigation }) {
               <Text style={styles.actionEmoji}>{saving ? "⏳" : saved ? "✅" : "💾"}</Text>
               <View style={styles.actionTextWrap}>
                 <Text style={[styles.actionTitle, { color: "#4ADE80" }]}>
-                  {saving ? "Saving..." : saved ? "Saved to Gallery!" : "Download Card to Gallery"}
+                  {saving ? t("saving") : saved ? t("savedToGallery") : t("downloadCard")}
                 </Text>
-                <Text style={styles.actionSub}>Saves as image in Nimantran folder</Text>
+                <Text style={styles.actionSub}>{t("downloadSub")}</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -274,33 +276,33 @@ export default function PreviewScreen({ navigation }) {
               <Text style={styles.actionEmoji}>{sharing ? "⏳" : "📤"}</Text>
               <View style={styles.actionTextWrap}>
                 <Text style={[styles.actionTitle, { color: g1 }]}>
-                  {sharing ? "Preparing..." : "Share Card as Image"}
+                  {sharing ? t("preparing") : t("shareCardImage")}
                 </Text>
-                <Text style={styles.actionSub}>WhatsApp, Instagram, Telegram & more</Text>
+                <Text style={styles.actionSub}>{t("shareCardSub")}</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
 
           {/* Share text */}
           <BigButton gradient={[g1, g2]} onPress={handleShareText} style={styles.shadow}>
-            📝  Share Text → Any App
+            {t("shareText")}
           </BigButton>
 
           {/* WhatsApp direct share */}
           <View style={styles.waBox}>
-            <Text style={styles.waTitle}>💬 SEND ON WHATSAPP</Text>
+            <Text style={styles.waTitle}>{t("sendOnWhatsapp")}</Text>
             <View style={styles.waRow}>
               <View style={styles.countryCode}><Text style={styles.countryTxt}>+91</Text></View>
               <TextInput
                 style={styles.waInput} value={form.whatsapp} placeholderTextColor="rgba(255,255,255,0.25)"
                 onChangeText={v => setForm({ whatsapp: v.replace(/[^\d+\s]/g, "") })}
-                placeholder="Number (optional)" keyboardType="phone-pad" maxLength={15}
+                placeholder={t("waNumberPh")} keyboardType="phone-pad" maxLength={15}
               />
             </View>
             <TouchableOpacity style={styles.waSendBtn} onPress={handleWhatsApp} activeOpacity={0.85}>
-              <Text style={styles.waSendTxt}>💬  Send on WhatsApp</Text>
+              <Text style={styles.waSendTxt}>{t("sendWaBtn")}</Text>
             </TouchableOpacity>
-            {waSent && <Text style={styles.successMsg}>✅ WhatsApp opened!</Text>}
+            {waSent && <Text style={styles.successMsg}>{t("waOpened")}</Text>}
           </View>
 
           {/* Save to history */}
@@ -308,7 +310,7 @@ export default function PreviewScreen({ navigation }) {
             style={styles.ghostBtn} onPress={handleSaveToHistory} activeOpacity={0.8}
           >
             <Text style={[styles.ghostTxt, { color: dbSaved ? "#4ADE80" : "rgba(255,255,255,0.38)" }]}>
-              {dbSaved ? "✅ Saved to History!" : "🗂️  Save to My Invites"}
+              {dbSaved ? t("savedToHistory") : t("saveToHistory")}
             </Text>
           </TouchableOpacity>
 
@@ -318,11 +320,11 @@ export default function PreviewScreen({ navigation }) {
             onPress={() => { resetFlow(); navigation.navigate("Home"); }}
             activeOpacity={0.8}
           >
-            <Text style={styles.ghostTxt}>＋  Create Another Invite</Text>
+            <Text style={styles.ghostTxt}>{t("createAnother")}</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.footer}>Nimantran · Made with ❤️</Text>
+        <Text style={styles.footer}>{t("madeWith")}</Text>
       </ScrollView>
     </SafeAreaView>
   );

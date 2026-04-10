@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  SafeAreaView, StatusBar, Alert, ActivityIndicator,
+  SafeAreaView, StatusBar, Alert,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { apiGetInvites, apiDeleteInvite } from "../api/client";
 import { findOccasion } from "../constants/occasions";
 import { formatDate, formatTime } from "../utils/formatters";
+import { useT } from "../i18n";
+import NimantranLoader from "../components/NimantranLoader";
 
 export default function HistoryScreen({ navigation }) {
+  const t = useT();
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -29,16 +32,16 @@ export default function HistoryScreen({ navigation }) {
   useFocusEffect(useCallback(() => { load(); }, []));
 
   async function handleDelete(id) {
-    Alert.alert("Delete Invite", "Remove this invite from history?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("deleteInvite"), t("deleteConfirm"), [
+      { text: t("cancel"), style: "cancel" },
       {
-        text: "Delete", style: "destructive",
+        text: t("delete"), style: "destructive",
         onPress: async () => {
           try {
             await apiDeleteInvite(id);
             setInvites(prev => prev.filter(i => i.id !== id));
           } catch {
-            Alert.alert("Error", "Could not delete. Please try again.");
+            Alert.alert("Error", t("couldntDelete"));
           }
         },
       },
@@ -48,7 +51,12 @@ export default function HistoryScreen({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <ActivityIndicator color="#C77DFF" size="large" style={{ marginTop: 60 }} />
+        <View style={styles.emptyWrap}>
+          <NimantranLoader
+            label={t("sendingInvites")}
+            sublabel={t("loadingInvites")}
+          />
+        </View>
       </SafeAreaView>
     );
   }
@@ -57,11 +65,11 @@ export default function HistoryScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.emptyWrap}>
-          <Text style={styles.emptyEmoji}>{"\u{1F512}"}</Text>
-          <Text style={styles.emptyTitle}>Not logged in</Text>
-          <Text style={styles.emptySub}>Log in to see your saved invitations.</Text>
-          <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate("Login")}>
-            <Text style={styles.loginTxt}>Log In</Text>
+          <Text style={styles.emptyEmoji}>{"\u26A0\uFE0F"}</Text>
+          <Text style={styles.emptyTitle}>{t("couldntLoad")}</Text>
+          <Text style={styles.emptySub}>{error}</Text>
+          <TouchableOpacity style={styles.loginBtn} onPress={load}>
+            <Text style={styles.loginTxt}>{t("retry")}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -73,10 +81,10 @@ export default function HistoryScreen({ navigation }) {
       <SafeAreaView style={styles.safe}>
         <View style={styles.emptyWrap}>
           <Text style={styles.emptyEmoji}>{"\u{1F4ED}"}</Text>
-          <Text style={styles.emptyTitle}>No invites yet</Text>
-          <Text style={styles.emptySub}>Create your first invite to save it here.</Text>
+          <Text style={styles.emptyTitle}>{t("noInvites")}</Text>
+          <Text style={styles.emptySub}>{t("createFirst")}</Text>
           <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate("Home")}>
-            <Text style={styles.loginTxt}>Create Invite</Text>
+            <Text style={styles.loginTxt}>{t("createInvite")}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -87,8 +95,8 @@ export default function HistoryScreen({ navigation }) {
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
       <View style={styles.header}>
-        <Text style={styles.heading}>My Invites {"\u{1F5C2}\uFE0F"}</Text>
-        <Text style={styles.count}>{invites.length} saved</Text>
+        <Text style={styles.heading}>{t("myInvitesTitle")}</Text>
+        <Text style={styles.count}>{invites.length} {t("saved")}</Text>
       </View>
       <FlatList
         data={invites}
@@ -103,8 +111,8 @@ export default function HistoryScreen({ navigation }) {
                 <Text style={styles.cardIcon}>{occ.icons[0]}</Text>
                 <View style={styles.cardInfo}>
                   <Text style={[styles.cardOcc, { color: g1 }]}>{item.occasion_name}</Text>
-                  <Text style={styles.cardSender}>From: {item.sender_name}</Text>
-                  {item.recip_name ? <Text style={styles.cardRecip}>To: {item.recip_name}</Text> : null}
+                  <Text style={styles.cardSender}>{t("fromLabel")} {item.sender_name}</Text>
+                  {item.recip_name ? <Text style={styles.cardRecip}>{t("toLabel")} {item.recip_name}</Text> : null}
                   <Text style={styles.cardDate}>
                     {formatDate(item.event_date)} {item.event_time ? "\u00B7 " + formatTime(item.event_time) : ""}
                   </Text>

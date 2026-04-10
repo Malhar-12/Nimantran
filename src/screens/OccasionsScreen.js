@@ -4,19 +4,21 @@ import {
 } from "react-native";
 import { CATEGORIES, findCategory } from "../constants/occasions";
 import { useInviteStore } from "../store/inviteStore";
+import { useT } from "../i18n";
 import ProgressDots from "../components/ProgressDots";
 import BigButton from "../components/BigButton";
 
 export default function OccasionsScreen({ route, navigation }) {
   const { catId } = route.params;
   const cat = findCategory(catId);
+  const t = useT();
 
   const occId      = useInviteStore(s => s.occasionId);
   const setOccId   = useInviteStore(s => s.setOccasionId);
 
   function handleContinue() {
     if (!occId) {
-      alert("Please select an occasion first!");
+      alert(t("pleaseSelectOccasion"));
       return;
     }
     navigation.navigate("Form");
@@ -27,11 +29,11 @@ export default function OccasionsScreen({ route, navigation }) {
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backTxt}>{"\u2190"} Back</Text>
+          <Text style={styles.backTxt}>{"\u2190"} {t("back")}</Text>
         </TouchableOpacity>
         <Text style={styles.catEmoji}>{cat.emoji}</Text>
         <Text style={styles.catLabel}>{cat.label}</Text>
-        <Text style={styles.catSub}>Pick your occasion</Text>
+        <Text style={styles.catSub}>{t("pickOccasion")}</Text>
         <ProgressDots step={0} total={5} color={cat.color} />
       </View>
       <FlatList
@@ -63,7 +65,7 @@ export default function OccasionsScreen({ route, navigation }) {
       />
       <View style={styles.bottom}>
         <BigButton gradient={[cat.color, cat.color + "bb"]} onPress={handleContinue}>
-          Continue {"\u2192"}
+          {t("continue")} {"\u2192"}
         </BigButton>
       </View>
     </SafeAreaView>

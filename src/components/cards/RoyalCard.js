@@ -77,8 +77,8 @@ export default function RoyalCard({ occ, form, generatedText, t }) {
           </View>
         </View>
 
-        {form.note ? (
-          <Text style={[styles.noteText, { color: g1 + "88" }]}>"{form.note}"</Text>
+        {form.note?.trim() ? (
+          <Text style={[styles.noteText, { color: g1 + "88" }]}>"{form.note.trim()}"</Text>
         ) : null}
 
         {/* Footer */}

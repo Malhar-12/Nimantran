@@ -5,6 +5,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { CATEGORIES } from "../constants/occasions";
 import { useInviteStore } from "../store/inviteStore";
+import { useT } from "../i18n";
 // ── Firebase disabled in guest-only mode ──
 // import { firebaseSignOut } from "../lib/firebase";
 
@@ -15,6 +16,9 @@ export default function HomeScreen({ navigation }) {
   const resetFlow     = useInviteStore(s => s.resetFlow);
   const user          = useInviteStore(s => s.user);
   const logout        = useInviteStore(s => s.logout);
+  const uiLang        = useInviteStore(s => s.uiLang);
+  const toggleUiLang  = useInviteStore(s => s.toggleUiLang);
+  const t             = useT();
   const bounceAnims   = useRef(HEADER_EMOJIS.map(() => new Animated.Value(0))).current;
 
   // ── Account handler DISABLED in guest-only mode ──
@@ -56,6 +60,18 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
+      {/* Top-right language toggle pill */}
+      <TouchableOpacity onPress={toggleUiLang} activeOpacity={0.85} style={styles.langPill}>
+        <LinearGradient
+          colors={["rgba(199,125,255,0.18)", "rgba(123,47,190,0.18)"]}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          style={styles.langPillInner}
+        >
+          <Text style={styles.langFlag}>{uiLang === "en" ? "🇬🇧" : "🇮🇳"}</Text>
+          <Text style={styles.langCode}>{uiLang === "en" ? "EN" : "हिं"}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+
       {/* Top-right account button — HIDDEN in guest-only mode (re-enable with Firebase) */}
       {/*
       <TouchableOpacity onPress={handleAccount} activeOpacity={0.85} style={styles.accountBtn}>
@@ -83,7 +99,7 @@ export default function HomeScreen({ navigation }) {
           <LinearGradient colors={["#C77DFF","#7B2FBE","#FF6B9D"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.titleGrad}>
             <Text style={styles.title}>Nimantran</Text>
           </LinearGradient>
-          <Text style={styles.tagline}>SMART INVITATION MAKER {"\u2728"}</Text>
+          <Text style={styles.tagline}>{t("tagline")} {"\u2728"}</Text>
         </View>
 
         <View style={styles.catList}>
@@ -97,14 +113,14 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.catEmoji}>{cat.emoji}</Text>
               <View style={styles.catInfo}>
                 <Text style={[styles.catLabel, { color: cat.color }]}>{cat.label}</Text>
-                <Text style={styles.catCount}>{cat.occasions.length} occasions</Text>
+                <Text style={styles.catCount}>{cat.occasions.length} {t("occasionsCount")}</Text>
               </View>
               <Text style={styles.arrow}>{"\u203A"}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={styles.footer}>36+ occasions {"\u00B7"} 28 languages {"\u00B7"} 4 templates {"\u00B7"} Direct share {"\u{1F4F2}"}</Text>
+        <Text style={styles.footer}>{t("footerLine")}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -155,4 +171,23 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.55)",
     marginLeft: 8,
   },
+  langPill: {
+    position: "absolute",
+    top: 50,
+    right: 16,
+    zIndex: 10,
+    borderRadius: 20,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(199,125,255,0.35)",
+  },
+  langPillInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    gap: 6,
+  },
+  langFlag: { fontSize: 14 },
+  langCode: { fontFamily: "Poppins_700Bold", fontSize: 12, color: "#fff", letterSpacing: 0.5 },
 });

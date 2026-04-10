@@ -63,9 +63,9 @@ export default function FestiveCard({ occ, form, generatedText, t }) {
         ))}
       </View>
 
-      {form.note ? (
+      {form.note?.trim() ? (
         <View style={[styles.noteBubble, { backgroundColor: g1 + "15", borderColor: g1 + "33" }]}>
-          <Text style={[styles.noteText, { color: g1 }]}>💬 "{form.note}"</Text>
+          <Text style={[styles.noteText, { color: g1 }]}>💬 "{form.note.trim()}"</Text>
         </View>
       ) : null}
 

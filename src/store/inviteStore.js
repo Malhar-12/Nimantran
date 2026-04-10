@@ -1,7 +1,22 @@
 import { create } from "zustand";
 import { getStoredToken, clearStoredToken, apiGetMe, apiGuestInit } from "../api/client";
+import { setSecure, getSecure } from "../lib/secureStorage";
+
+const UI_LANG_KEY = "@nimantran_ui_lang";
 
 export const useInviteStore = create((set, get) => ({
+  // ── UI Language (English / Hindi for now) ────────────
+  uiLang: "en",
+  setUiLang: async (lang) => {
+    set({ uiLang: lang });
+    try { await setSecure(UI_LANG_KEY, lang); } catch {}
+  },
+  toggleUiLang: async () => {
+    const next = get().uiLang === "en" ? "hi" : "en";
+    set({ uiLang: next });
+    try { await setSecure(UI_LANG_KEY, next); } catch {}
+  },
+
   // ── Auth ─────────────────────────────────────────────
   user: null,
   token: null,
@@ -48,6 +63,12 @@ export const useInviteStore = create((set, get) => ({
    */
   ensureGuest: async () => {
     try {
+      // Restore UI language preference
+      try {
+        const savedLang = await getSecure(UI_LANG_KEY);
+        if (savedLang === "en" || savedLang === "hi") set({ uiLang: savedLang });
+      } catch {}
+
       let token = await getStoredToken();
       if (!token) {
         try {

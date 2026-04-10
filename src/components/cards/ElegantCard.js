@@ -73,8 +73,8 @@ export default function ElegantCard({ occ, form, generatedText, t }) {
             </View>
           </View>
 
-          {form.note ? (
-            <Text style={styles.noteText}>✒️ "{form.note}"</Text>
+          {form.note?.trim() ? (
+            <Text style={styles.noteText}>✒️ "{form.note.trim()}"</Text>
           ) : null}
 
           {/* Bottom ornament */}

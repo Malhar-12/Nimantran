@@ -66,8 +66,8 @@ export default function VibrantCard({ occ, form, generatedText, t }) {
           <Text style={styles.detailValue}>{form.location || "—"}</Text>
         </View>
 
-        {form.note ? (
-          <Text style={styles.noteText}>"{form.note}"</Text>
+        {form.note?.trim() ? (
+          <Text style={styles.noteText}>"{form.note.trim()}"</Text>
         ) : null}
       </View>
 

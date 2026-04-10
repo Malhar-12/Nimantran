@@ -62,8 +62,8 @@ export default function LuxeCard({ occ, form, generatedText, t }) {
         </View>
       </View>
 
-      {form.note ? (
-        <Text style={[styles.noteText, { color: goldFade }]}>"{form.note}"</Text>
+      {form.note?.trim() ? (
+        <Text style={[styles.noteText, { color: goldFade }]}>"{form.note.trim()}"</Text>
       ) : null}
 
       {/* Footer emojis */}
