@@ -7,6 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { TEMPLATES } from "../constants/templates";
 import { findOccasion } from "../constants/occasions";
 import { useInviteStore } from "../store/inviteStore";
+import { useT } from "../i18n";
 import ProgressDots from "../components/ProgressDots";
 import BigButton from "../components/BigButton";
 
@@ -16,57 +17,58 @@ export default function TemplatesScreen({ navigation }) {
   const setTmplId   = useInviteStore(s => s.setTemplateId);
   const occ         = findOccasion(occId);
   const [g1, g2]    = occ.gradient;
+  const T = useT();
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor="#0C0C14" />
       <View style={styles.wrap}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backTxt}>{"\u2190"} Back</Text>
+          <Text style={styles.backTxt}>{"\u2190"} {T("back")}</Text>
         </TouchableOpacity>
         <View style={styles.headCenter}>
           <Text style={styles.emoji}>{"\u{1F3A8}"}</Text>
-          <Text style={styles.title}>Pick a Template</Text>
-          <Text style={styles.sub}>8 premium styles</Text>
+          <Text style={styles.title}>{T("pickTemplate")}</Text>
+          <Text style={styles.sub}>{T("premiumStyles")}</Text>
           <ProgressDots step={2} total={5} color={g1} />
         </View>
         <FlatList
           data={TEMPLATES}
-          keyExtractor={t => t.id}
+          keyExtractor={tmpl => tmpl.id}
           numColumns={2}
           contentContainerStyle={styles.grid}
-          renderItem={({ item: t }) => {
-            const sel = tmplId === t.id;
-            const previewBg = t.preview.bg || occ.bg || "#1A1A2E";
+          renderItem={({ item: tmpl }) => {
+            const sel = tmplId === tmpl.id;
+            const previewBg = tmpl.preview.bg || occ.bg || "#1A1A2E";
             return (
               <TouchableOpacity
                 activeOpacity={0.85}
                 style={[styles.card, { borderColor: sel ? g1 : "rgba(255,255,255,0.1)", backgroundColor: sel ? g1 + "18" : "rgba(255,255,255,0.04)" }]}
-                onPress={() => setTmplId(t.id)}
+                onPress={() => setTmplId(tmpl.id)}
               >
-                {(t.id === "vibrant" || t.id === "royal") ? (
-                  <LinearGradient colors={t.id === "royal" ? [g1, "#1A0A2E"] : [g1, g2]} style={styles.preview} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <Text style={[styles.previewWord, { color: "#fff" }]}>{t.name.split(" ")[0]}</Text>
+                {(tmpl.id === "vibrant" || tmpl.id === "royal") ? (
+                  <LinearGradient colors={tmpl.id === "royal" ? [g1, "#1A0A2E"] : [g1, g2]} style={styles.preview} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                    <Text style={[styles.previewWord, { color: "#fff" }]}>{tmpl.name.split(" ")[0]}</Text>
                   </LinearGradient>
-                ) : t.id === "festive" ? (
+                ) : tmpl.id === "festive" ? (
                   <LinearGradient colors={["#FFF8E1", "#FFECB3"]} style={styles.preview} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <Text style={[styles.previewWord, { color: g1 }]}>{t.name.split(" ")[0]}</Text>
+                    <Text style={[styles.previewWord, { color: g1 }]}>{tmpl.name.split(" ")[0]}</Text>
                   </LinearGradient>
                 ) : (
                   <View style={[styles.preview, { backgroundColor: previewBg }]}>
-                    <Text style={[styles.previewWord, { color: t.preview.text }]}>{t.name.split(" ")[0]}</Text>
+                    <Text style={[styles.previewWord, { color: tmpl.preview.text }]}>{tmpl.name.split(" ")[0]}</Text>
                   </View>
                 )}
-                <Text style={[styles.tmplName, { color: sel ? g1 : "#fff" }]}>{t.name}</Text>
-                <Text style={styles.tmplDesc}>{t.desc}</Text>
-                {sel && <Text style={[styles.checkmark, { color: g1 }]}>{"\u2713"} Selected</Text>}
+                <Text style={[styles.tmplName, { color: sel ? g1 : "#fff" }]}>{tmpl.name}</Text>
+                <Text style={styles.tmplDesc}>{tmpl.desc}</Text>
+                {sel && <Text style={[styles.checkmark, { color: g1 }]}>{"\u2713"} {T("selected")}</Text>}
               </TouchableOpacity>
             );
           }}
         />
         <View style={styles.footer}>
           <BigButton gradient={[g1, g2]} onPress={() => navigation.navigate("Languages")}>
-            Choose Language {"\u2192"}
+            {T("chooseLanguage")} {"\u2192"}
           </BigButton>
         </View>
       </View>
