@@ -11,14 +11,11 @@ export default function FloralCard({ occ, form, generatedText, t }) {
     <View style={styles.root}>
       {/* Header wave area */}
       <LinearGradient colors={[g1 + "dd", g2 + "dd"]} style={styles.header} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-        <Text style={styles.headerEmojis}>{occ.icons.slice(0, 5).join(" ")}</Text>
+        <Text style={styles.headerEmojis}>{occ.icons.slice(0, 5).join("  ")}</Text>
         <Text style={styles.headerTitle}>{occ.name.toUpperCase()}</Text>
       </LinearGradient>
 
       <View style={styles.body}>
-        {/* Floating emojis row */}
-        <Text style={styles.floatEmojis}>{occ.icons.slice(0, 7).join("  ")}</Text>
-
         {/* Guest name on top */}
         {guestDisplay ? (
           <Text style={[styles.guestText, { color: g1 }]}>{t.dear} {guestDisplay},</Text>
@@ -60,8 +57,10 @@ export default function FloralCard({ occ, form, generatedText, t }) {
       </View>
 
       {/* Footer wave */}
+      {/* Subtle emoji accent */}
+      <Text style={styles.footerEmojis}>{occ.icons.slice(5, 9).join("   ")}</Text>
+
       <LinearGradient colors={[g1 + "cc", g2 + "cc"]} style={styles.footer} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-        <Text style={styles.emojiStrip}>{occ.icons.join(" ")}</Text>
         <Text style={styles.footerText}>Nimantran</Text>
       </LinearGradient>
     </View>
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
   headerEmojis: { fontSize: 26, marginBottom: 4 },
   headerTitle: { fontFamily: "PlayfairDisplay_900Black", fontSize: 24, color: "#fff", textAlign: "center", letterSpacing: 1 },
   body: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 0, alignItems: "center" },
-  floatEmojis: { fontSize: 15, textAlign: "center", marginBottom: 8, opacity: 0.6 },
+  footerEmojis: { fontSize: 16, textAlign: "center", marginTop: 6, opacity: 0.55, letterSpacing: 4 },
   guestText: { fontFamily: "PlayfairDisplay_700Bold_Italic", fontSize: 18, fontStyle: "italic", marginBottom: 6, textAlign: "center" },
   bodyText: { fontFamily: "Poppins_500Medium", fontSize: 13, color: "#3D2000", textAlign: "center", lineHeight: 22, marginBottom: 4 },
   senderName: { fontFamily: "PlayfairDisplay_900Black", fontSize: 18, textAlign: "center", marginBottom: 6 },
@@ -87,6 +86,6 @@ const styles = StyleSheet.create({
   detailValue: { fontFamily: "Poppins_700Bold", fontSize: 12, color: "#2D1A00", textAlign: "center", marginTop: 2 },
   noteText: { fontFamily: "Poppins_500Medium", fontSize: 12, fontStyle: "italic", textAlign: "center", marginBottom: 8 },
   footer: { paddingVertical: 12, alignItems: "center", marginTop: 8 },
-  emojiStrip: { fontSize: 14, textAlign: "center", marginBottom: 4 },
+  /* cleaned up — emojis now in header (4) + footer (3) */
   footerText: { fontFamily: "Poppins_700Bold", fontSize: 11, color: "#fff" },
 });

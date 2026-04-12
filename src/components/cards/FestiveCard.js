@@ -14,31 +14,29 @@ export default function FestiveCard({ occ, form, generatedText, t }) {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      {/* Confetti emojis scattered */}
-      <Text style={[styles.confetti, { top: 8, left: 12 }]}>🎊</Text>
-      <Text style={[styles.confetti, { top: 8, right: 12 }]}>🎉</Text>
-      <Text style={[styles.confetti, { top: 50, right: 30 }]}>✨</Text>
-      <Text style={[styles.confetti, { top: 45, left: 25 }]}>🎈</Text>
-
       {/* Big emoji header */}
       <View style={styles.headerWrap}>
         <Text style={styles.bigEmoji}>{occ.icons[0]}</Text>
         <LinearGradient colors={[g1, g2]} style={styles.titlePill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
           <Text style={styles.titleText}>{occ.name.toUpperCase()}</Text>
         </LinearGradient>
-        <Text style={[styles.invitedBadge, { backgroundColor: g1 + "22", color: g1 }]}>{t.youreInvited} 🎉</Text>
+        <Text style={[styles.invitedBadge, { backgroundColor: g1 + "22", color: g1 }]}>{t.youreInvited}</Text>
       </View>
 
-      {/* Emoji parade */}
-      <Text style={styles.emojiParade}>{occ.icons.slice(0, 7).join("  ")}</Text>
+      {/* Emoji accent */}
+      <Text style={styles.emojiAccent}>{occ.icons.slice(1, 6).join("   ")}</Text>
 
       {/* Guest */}
       {guestDisplay ? (
-        <Text style={[styles.guestText, { color: g1 }]}>{t.dear} {guestDisplay},</Text>
+        <Text style={[styles.guestText, { color: g1 }]}>{t.dear} {guestDisplay}</Text>
       ) : null}
 
-      {/* Wavy line */}
-      <Text style={[styles.wavyLine, { color: g1 + "44" }]}>〰️〰️〰️〰️〰️〰️〰️〰️</Text>
+      {/* Divider */}
+      <View style={[styles.dividerRow, { zIndex: 1 }]}>
+        <View style={[styles.dividerLine, { backgroundColor: g1 + "33" }]} />
+        <Text style={[styles.dividerDot, { color: g1 }]}>✦</Text>
+        <View style={[styles.dividerLine, { backgroundColor: g1 + "33" }]} />
+      </View>
 
       {/* Body */}
       <Text style={styles.bodyText}>{generatedText || ""}</Text>
@@ -46,7 +44,9 @@ export default function FestiveCard({ occ, form, generatedText, t }) {
       {/* Sender */}
       <Text style={[styles.senderName, { color: g1 }]}>— {form.senderName || "Your Name"}</Text>
 
-      <Text style={[styles.wavyLine, { color: g1 + "33" }]}>〰️〰️〰️〰️〰️〰️〰️〰️</Text>
+      <View style={[styles.dividerRow, { zIndex: 1, marginHorizontal: 16 }]}>
+        <View style={[styles.dividerLine, { backgroundColor: g1 + "22" }]} />
+      </View>
 
       {/* Details boxes */}
       <View style={styles.detailsRow}>
@@ -70,8 +70,11 @@ export default function FestiveCard({ occ, form, generatedText, t }) {
       ) : null}
 
       {/* Footer */}
+      {/* Footer emoji accent */}
+      <Text style={styles.footerEmojis}>{occ.icons.slice(6, 9).join("   ")}</Text>
+
       <LinearGradient colors={[g1, g2]} style={styles.footer} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-        <Text style={styles.footerText}>🎊 Nimantran 🎊</Text>
+        <Text style={styles.footerText}>Nimantran</Text>
       </LinearGradient>
     </LinearGradient>
   );
@@ -79,7 +82,11 @@ export default function FestiveCard({ occ, form, generatedText, t }) {
 
 const styles = StyleSheet.create({
   root: { borderRadius: 16, overflow: "hidden", position: "relative" },
-  confetti: { position: "absolute", fontSize: 16, zIndex: 0, opacity: 0.5 },
+  dividerRow: { flexDirection: "row", alignItems: "center", width: "70%", alignSelf: "center", marginVertical: 6 },
+  dividerLine: { flex: 1, height: 1 },
+  dividerDot: { marginHorizontal: 10, fontSize: 8 },
+  emojiAccent: { fontSize: 20, textAlign: "center", marginVertical: 6, zIndex: 1, opacity: 0.8, letterSpacing: 4 },
+  footerEmojis: { fontSize: 16, textAlign: "center", marginTop: 6, opacity: 0.5, letterSpacing: 4 },
   headerWrap: { alignItems: "center", paddingTop: 20, paddingBottom: 4, zIndex: 1 },
   bigEmoji: { fontSize: 44, marginBottom: 4 },
   titlePill: { borderRadius: 20, paddingHorizontal: 20, paddingVertical: 8, marginBottom: 6 },

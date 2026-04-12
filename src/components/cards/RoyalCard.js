@@ -29,9 +29,6 @@ export default function RoyalCard({ occ, form, generatedText, t }) {
           <View style={[styles.decoLine, { backgroundColor: g1 + "44" }]} />
         </View>
 
-        {/* Emoji row */}
-        <Text style={styles.emojiRow}>{occ.icons.slice(0, 5).join("  ")}</Text>
-
         {/* Guest name */}
         {guestDisplay ? (
           <Text style={[styles.guestText, { color: g1 }]}>{t.dear} {guestDisplay},</Text>
@@ -42,6 +39,9 @@ export default function RoyalCard({ occ, form, generatedText, t }) {
 
         {/* Sender */}
         <Text style={[styles.senderName, { color: g1 }]}>— {form.senderName || "Your Name"}</Text>
+
+        {/* Emoji accent row */}
+        <Text style={styles.emojiAccent}>{occ.icons.slice(1, 5).join("  ")}</Text>
 
         {/* Decorative divider */}
         <View style={styles.decoRow}>
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   decoLine: { flex: 1, height: 1 },
   decoEmoji: { fontSize: 18, marginHorizontal: 10 },
   decoStar: { fontSize: 12, color: "rgba(255,255,255,0.3)", marginHorizontal: 10 },
-  emojiRow: { fontSize: 20, marginVertical: 6, textAlign: "center" },
+  emojiAccent: { fontSize: 18, textAlign: "center", marginVertical: 6, opacity: 0.75, letterSpacing: 4 },
   guestText: { fontFamily: "PlayfairDisplay_700Bold_Italic", fontSize: 18, fontStyle: "italic", marginTop: 4, marginBottom: 6, textAlign: "center" },
   bodyText: { fontFamily: "Poppins_500Medium", fontSize: 13, color: "rgba(255,255,255,0.85)", textAlign: "center", lineHeight: 22, marginVertical: 8, paddingHorizontal: 4 },
   senderName: { fontFamily: "PlayfairDisplay_900Black", fontSize: 18, textAlign: "center", marginBottom: 6 },

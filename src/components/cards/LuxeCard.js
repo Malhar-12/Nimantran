@@ -17,7 +17,7 @@ export default function LuxeCard({ occ, form, generatedText, t }) {
       <Text style={[styles.corner, { bottom: 14, right: 14 }]}>✦</Text>
 
       {/* Emoji strip header */}
-      <Text style={styles.emojiRow}>{occ.icons.slice(0, 5).join(" ")}</Text>
+      <Text style={styles.emojiRow}>{occ.icons.slice(0, 5).join("  ")}</Text>
 
       {/* Title */}
       <LinearGradient colors={[gold, "#F0D080", gold]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.titleGrad}>
@@ -67,7 +67,7 @@ export default function LuxeCard({ occ, form, generatedText, t }) {
       ) : null}
 
       {/* Footer emojis */}
-      <Text style={styles.emojiRow}>{occ.icons.join(" ")}</Text>
+      <Text style={styles.footerEmojis}>{occ.icons.slice(4, 8).join("   ")}</Text>
 
       {/* Footer */}
       <LinearGradient colors={["#0D0D0D", gold, gold, "#0D0D0D"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.footer}>
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   detailValue: { fontFamily: "Poppins_700Bold", fontSize: 13, color: "#fff", textAlign: "center" },
   detailDivider: { width: "60%", height: 1, backgroundColor: "rgba(201,168,76,0.2)", marginVertical: 4 },
   noteText: { fontFamily: "Poppins_500Medium", fontSize: 12, fontStyle: "italic", textAlign: "center", marginVertical: 6 },
+  footerEmojis: { fontSize: 18, textAlign: "center", marginTop: 8, opacity: 0.7, letterSpacing: 4 },
   footer: { width: "110%", paddingVertical: 10, alignItems: "center", borderBottomLeftRadius: 14, borderBottomRightRadius: 14, marginTop: 10, marginBottom: -20 },
   footerText: { fontFamily: "Poppins_700Bold", fontSize: 11, color: "#0D0D0D" },
 });

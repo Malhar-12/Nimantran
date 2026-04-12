@@ -24,8 +24,8 @@ export default function ElegantCard({ occ, form, generatedText, t }) {
           <Text style={[styles.title, { color: g1 }]}>{occ.name.toUpperCase()}</Text>
           <Text style={styles.subtitleLine}>— {t.invitation} —</Text>
 
-          {/* Emoji row */}
-          <Text style={styles.emojiRow}>{occ.icons.slice(0, 5).join("  ")}</Text>
+          {/* Emoji accent */}
+          <Text style={styles.emojiAccent}>{occ.icons.slice(0, 5).join("  ")}</Text>
 
           {/* Ornamental divider */}
           <View style={styles.ornDivider}>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   ornament: { fontSize: 20, color: "#999", marginVertical: 4 },
   title: { fontFamily: "PlayfairDisplay_900Black", fontSize: 24, letterSpacing: 2, textAlign: "center", marginTop: 2 },
   subtitleLine: { fontFamily: "Poppins_500Medium", fontSize: 11, color: "#999", letterSpacing: 2, marginBottom: 6 },
-  emojiRow: { fontSize: 20, marginVertical: 6, textAlign: "center" },
+  emojiAccent: { fontSize: 18, marginVertical: 6, textAlign: "center", opacity: 0.7, letterSpacing: 4 },
   ornDivider: { flexDirection: "row", alignItems: "center", width: "100%", marginVertical: 10 },
   ornLine: { flex: 1, height: 1 },
   ornDiamond: { fontSize: 8, marginHorizontal: 10 },

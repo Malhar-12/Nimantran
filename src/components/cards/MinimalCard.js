@@ -31,6 +31,9 @@ export default function MinimalCard({ occ, form, generatedText, t }) {
         {/* Sender */}
         <Text style={[styles.senderName, { color: g1 }]}>— {form.senderName || "Your Name"}</Text>
 
+        {/* Emoji accent */}
+        <Text style={styles.emojiAccent}>{occ.icons.slice(1, 7).join("  ")}</Text>
+
         {/* Details - clean layout */}
         <View style={[styles.thinLine, { backgroundColor: g1 + "22" }]} />
 
@@ -54,9 +57,6 @@ export default function MinimalCard({ occ, form, generatedText, t }) {
         ) : null}
 
         <View style={[styles.thinLine, { backgroundColor: g1 + "22" }]} />
-
-        {/* Emoji strip */}
-        <Text style={styles.emojiStrip}>{occ.icons.slice(0, 5).join("  ")}</Text>
 
         {/* Footer */}
         <Text style={styles.footerText}>Nimantran</Text>
@@ -85,6 +85,6 @@ const styles = StyleSheet.create({
   detailLabel: { fontFamily: "Poppins_700Bold", fontSize: 9, letterSpacing: 1 },
   detailValue: { fontFamily: "Poppins_600SemiBold", fontSize: 13, color: "#1A1A1A", marginTop: 2, textAlign: "center" },
   noteText: { fontFamily: "Poppins_500Medium", fontSize: 12, fontStyle: "italic", color: "#888", textAlign: "center", marginTop: 8, marginBottom: 4 },
-  emojiStrip: { fontSize: 18, marginVertical: 4 },
+  emojiAccent: { fontSize: 18, marginVertical: 6, opacity: 0.65, letterSpacing: 4 },
   footerText: { fontFamily: "Poppins_700Bold", fontSize: 10, color: "#CCC", letterSpacing: 1.5, marginTop: 4 },
 });

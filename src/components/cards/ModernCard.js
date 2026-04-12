@@ -14,7 +14,7 @@ export default function ModernCard({ occ, form, generatedText, t }) {
 
       {/* Header */}
       <LinearGradient colors={[g1, g2]} style={styles.header} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-        <Text style={styles.headerEmojis}>{occ.icons.slice(0, 4).join(" ")}</Text>
+        <Text style={styles.headerEmojis}>{occ.icons.slice(0, 5).join("  ")}</Text>
         <Text style={styles.headerTitle}>{occ.name.toUpperCase()}</Text>
         <Text style={styles.headerSub}>{t.youreInvited}</Text>
       </LinearGradient>
@@ -51,8 +51,10 @@ export default function ModernCard({ occ, form, generatedText, t }) {
           <Text style={[styles.noteText, { color: g1 }]}>"{form.note.trim()}"</Text>
         ) : null}
 
-        <Text style={styles.emojiStrip}>{occ.icons.join(" ")}</Text>
       </View>
+
+      {/* Emoji accent */}
+      <Text style={styles.footerEmojis}>{occ.icons.slice(5, 9).join("   ")}</Text>
 
       {/* Footer */}
       <LinearGradient colors={[g1, g2]} style={styles.footer} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
@@ -80,7 +82,7 @@ const styles = StyleSheet.create({
   detailLabel: { fontFamily: "Poppins_700Bold", fontSize: 8, letterSpacing: 1.5 },
   detailValue: { fontFamily: "Poppins_700Bold", fontSize: 11, color: "#111", textAlign: "center", marginTop: 2 },
   noteText: { fontFamily: "Poppins_500Medium", fontSize: 12, fontStyle: "italic", textAlign: "center", marginBottom: 8 },
-  emojiStrip: { fontSize: 16, textAlign: "center", marginTop: 4 },
+  footerEmojis: { fontSize: 16, textAlign: "center", paddingVertical: 6, opacity: 0.55, letterSpacing: 4 },
   footer: { paddingVertical: 10, alignItems: "center" },
   footerText: { fontFamily: "Poppins_700Bold", fontSize: 11, color: "#fff" },
 });
